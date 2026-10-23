@@ -11,11 +11,7 @@ function crearControladorReservas(servicioReservas) {
       errores: null,
       valores: {},
       turnosPermitidos: ["Mañana", "Tarde", "Noche"],
-    salasPermitidas: [
-      "Sala Norte",
-      "Sala Sur",
-      "Sala Multimedia"
-    ]
+      salasPermitidas: ["Sala Norte", "Sala Sur", "Sala Multimedia"],
     });
   }
   function mostrarDetalle(req, res) {

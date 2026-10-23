@@ -15,7 +15,7 @@ async function main() {
         sala: reserva.sala,
         fecha: reserva.fecha,
         turno: reserva.turno,
-        personas: reserva.personas
+        personas: reserva.personas,
       })),
     );
     console.log("Total de reservas:", reservas_salas_u7.length);

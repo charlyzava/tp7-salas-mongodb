@@ -4,11 +4,11 @@ const { leerUriMongo } = require("./entorno");
 // Corrección utilizada en el aula para las consultas DNS de Atlas.
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 async function conectarBaseDatos() {
- await mongoose.connect(leerUriMongo(), {
- serverSelectionTimeoutMS: 5000,
- });
+  await mongoose.connect(leerUriMongo(), {
+    serverSelectionTimeoutMS: 5000,
+  });
 }
 async function desconectarBaseDatos() {
- await mongoose.disconnect();
+  await mongoose.disconnect();
 }
 module.exports = { conectarBaseDatos, desconectarBaseDatos };

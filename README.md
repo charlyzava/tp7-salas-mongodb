@@ -20,231 +20,281 @@ Cómo ejecutar el programa para consultar las reservas.
 
 Por qué esas operaciones son independientes de las rutas web de Express.
 
+////////////////////////////////////////
+TP 07 – Persistencia inicial de reservas de salas
 
-README
+1. Descripción del proyecto
+Este proyecto corresponde al Trabajo Práctico 07 del curso de Desarrollo Back-end con Node.js.
+El objetivo es incorporar persistencia de datos mediante MongoDB y Mongoose a una aplicación de reservas de salas de estudio desarrollada previamente en el TP 06.
+Se trabaja con dos partes independientes:
+•	Aplicación web: utiliza Express y conserva el funcionamiento del TP 06. Las reservas creadas desde el formulario continúan almacenándose en memoria.
+•	Laboratorio de persistencia: permite comprobar la conexión con MongoDB Atlas, crear reservas y consultar los documentos almacenados mediante programas ejecutados desde la terminal.
+En esta etapa no se modifica el servicio HTTP para utilizar MongoDB. La integración de la persistencia con las rutas web queda para una unidad posterior.
 
-# Trabajo práctico 07
-## Proyecto de partida y cambios
-## Instalación y ejecución
-## Configuración del entorno
-## Mapa de módulos y dependencias
-## Pipeline y contrato de rutas
-## Matriz antes/después
-## Formato y análisis estático
-## Persistencia temporal y límites
+2. Tecnologías utilizadas
+•	Node.js.
+•	Express.
+•	MongoDB Atlas Free (M0).
+•	Mongoose.
+•	JavaScript con módulos CommonJS.
+•	Dotenv / variables de entorno mediante --env-file.
+•	ESLint.
+•	Prettier.
+•	EJS, CSS y los demás recursos heredados del TP 06.
+Versiones utilizadas en el desarrollo:
+•	Node.js: completar con la versión instalada.
+•	npm: completar con la versión instalada.
+•	MongoDB Atlas: clúster Free (M0).
+•	Mongoose: completar con la versión instalada en package.json.
+Para consultar las versiones instaladas:
+node --version
+npm --version
+npm list mongoose
 
-
-Trabajo práctico 06
-Proyecto de partida y cambios
-El proyecto parte de una copia funcional del Trabajo Práctico 05, correspondiente a la aplicación de reservas de salas de estudio. La nueva copia debe llamarse tp-06-salas-modular.
-El objetivo principal no es agregar nuevas funcionalidades, sino reorganizar el código en módulos, separando las responsabilidades de arranque, configuración, aplicación, rutas, controladores, servicios y middleware.
-Se deben conservar las vistas EJS, el layout, CSS, datos iniciales, Morgan, el identificador de solicitud, la medición de duración, la validación del formulario y las respuestas HTTP del TP 05. 
-La estructura esperada es:
-tp-06-salas-modular/
-├── public/
-├── views/
+3. Estructura del proyecto
+La estructura principal del TP 07 es la siguiente:
+tp-07-salas-mongodb/
 ├── src/
+│   ├── config/
+│   │   ├── entorno.js
+│   │   └── base-datos.js
+│   ├── modelos/
+│   │   └── reserva.js
 │   ├── index.js
 │   ├── app.js
+│   ├── archivos.js
 │   ├── configuracion.js
 │   ├── rutas/
 │   │   └── reservas.js
 │   ├── controladores/
-│   │   └── reservas.js
+│   │   └── reservas.js   
 │   ├── servicios/
 │   │   └── reservas.js
-│   └── middleware/
-│       ├── solicitudes.js
-│       └── reservas.js
+│   └── ...
+├── scripts/
+│   ├── comprobar-conexion.js
+│   ├── crear-reserva.js
+│   └── listar-reservas.js
+├── public/
+├── views/
+├── .env
 ├── .env.example
 ├── .gitignore
 ├── eslint.config.js
 ├── package.json
 ├── package-lock.json
 └── README.md
-La idea de la modularización es que cada módulo tenga una responsabilidad clara y que los cambios futuros puedan realizarse en un lugar concreto, evitando tener toda la aplicación concentrada en index.js. 
-________________________________________
-Instalación y ejecución
-Primero se debe instalar el proyecto mediante:
+Responsabilidades principales
+•	src/config/entorno.js: centraliza la lectura de las variables de entorno y la configuración HTTP.
+•	src/config/base-datos.js: configura la resolución DNS y administra la conexión con MongoDB.
+•	src/configuracion.js: lee y valida la configuración de la aplicación, se usó en la versión anterior.
+•	src/archivos.js: lee archivos json y los convierte a objetos.
+•	src/modelos/reserva.js: define el esquema y las validaciones del modelo Reserva.
+•	scripts/comprobar-conexion.js: verifica la conexión con la base de datos.
+•	scripts/crear-reserva.js: crea y guarda una reserva de prueba.
+•	scripts/listar-reservas.js: consulta y muestra las reservas persistidas.
+
+4. Instalación y preparación del entorno
+
+4.1. Clonar o descargar el repositorio
+Clonar el repositorio individual desde GitHub y ubicarse en su carpeta raíz:
+git clone https://github.com/charlyzava/tp7-salas-mongodb
+cd tp-07-salas-mongodb
+
+4.2. Instalar las dependencias
 npm install
+Este comando instala las dependencias declaradas en package-lock.json.
 
-Para iniciar la aplicación:
+4.3. Configurar MongoDB Atlas
+Para utilizar MongoDB Atlas se deben realizar los siguientes pasos:
+1.	Ingresar a MongoDB Atlas y crear una cuenta, si todavía no se dispone de una.
+2.	Crear un proyecto para el trabajo práctico.
+3.	Crear un clúster gratuito de tipo Free (M0).
+4.	Crear un usuario de base de datos con permisos de lectura y escritura.
+5.	Configurar la lista de direcciones IP permitidas para que incluya la IP pública desde la que se ejecutará la aplicación.
+6.	Ingresar a la opción de conexión del clúster y obtener la cadena de conexión para una aplicación Node.js.
+7.	Reemplazar los marcadores de la cadena por el usuario, la contraseña y el host correspondientes.
+No se deben publicar la contraseña ni la URI privada del clúster.
+
+4.4. Configurar las variables de entorno
+renombrar .env.example a un archivo llamado .env. y agregar las credenciales de Atlas al archivo.
+
+La base de datos utilizada para este trabajo práctico se denomina:
+reservas_salas_u7
+
+
+5. Configuración y conexión con MongoDB
+
+La conexión se centraliza en src/config/base-datos.js, evitando repetir su configuración en cada programa.
+Antes de iniciar la conexión, el módulo configura los servidores DNS mediante:
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+Esta configuración utiliza resolutores DNS públicos para la resolución de nombres. Su aplicación afecta la resolución DNS de Node.js, pero no modifica la autenticación de MongoDB ni la lista de direcciones IP permitidas en Atlas.
+Si la red utilizada no permite estos resolutores o requiere otros servidores, se debe registrar el ajuste autorizado que se haya realizado.
+La URI se obtiene desde la variable MONGODB_URI. Si está ausente o no tiene el prefijo esperado, la conexión debe informar un error de configuración sin mostrar credenciales.
+Prueba de conexión
+Desde la raíz del proyecto, ejecutar:
+node --env-file=.env scripts/comprobar-conexion.js
+El programa debe esperar la confirmación de la conexión antes de anunciar el éxito. No debe crear documentos y debe cerrar la conexión tanto en caso de éxito como de error.
+Si se produce un error, se debe registrar el nombre del error, el código DNS cuando corresponda y la operación que falló, sin publicar la URI privada ni la contraseña.
+
+6. Modelo de datos: Reserva
+El modelo Reserva representa una solicitud de uso de una sala de estudio y se define mediante Mongoose.
+La colección de MongoDB se establece explícitamente como reservas.
+Campos y reglas de validación
+Campo	Tipo	Reglas
+estudiante	String	Obligatorio y sin espacios en los extremos.
+email	String	Obligatorio, con eliminación de espacios en los extremos y presencia de @.
+sala	String	Obligatorio. Valores permitidos: Sala Norte, Sala Sur o Sala Multimedia.
+fecha	String	Obligatorio y no vacío después de eliminar espacios en los extremos.
+turno	String	Obligatorio. Valores permitidos: Mañana, Tarde o Noche.
+personas	Number	Obligatorio, entero entre 1 y 6 inclusive.
+Para implementar estas reglas se utilizan las opciones de validación de Mongoose, como required, trim, enum, min, max, match y un validador personalizado con Number.isInteger.
+Las validaciones se ejecutan al guardar los documentos mediante el modelo.
+Limitaciones actuales
+
+Estas reglas corresponden al alcance inicial del trabajo práctico. Todavía no se valida de manera completa:
+•	La estructura real de una dirección de correo electrónico.
+•	La existencia de una fecha válida en el calendario.
+•	Que la fecha corresponda al futuro.
+•	La disponibilidad de las salas y los cupos compartidos.
+•	Los solapamientos entre reservas.
+•	La duplicación de solicitudes para una misma persona.
+No se exige un índice único para los campos de la reserva.
+MongoDB genera un identificador _id de tipo ObjectId para cada documento. Este identificador se utiliza para reconocer las reservas persistidas y se convierte a texto cuando se muestra en la terminal.
+La existencia de un _id en un objeto no demuestra por sí sola que los datos se hayan guardado en la base. Para confirmar la escritura, el programa debe esperar el resultado de la operación de guardado y mostrar el identificador después de que esta finalice correctamente.
+
+7. Programas de terminal
+Los tres programas se ejecutan desde la raíz del repositorio. Cada uno abre su propia conexión y la cierra al finalizar.
+7.1. Comprobar la conexión
+node --env-file=.env scripts/comprobar-conexion.js
+Comprueba que la configuración y la conexión con MongoDB Atlas funcionen correctamente.
+El programa no crea ni modifica reservas. Si ocurre un error, termina con un código de salida distinto de cero.
+7.2. Crear una reserva
+node --env-file=.env scripts/crear-reserva.js
+Crea una reserva ficticia mediante el modelo Reserva y espera la confirmación de la escritura.
+Si la operación finaliza correctamente, muestra el _id del documento guardado. Si falla una validación o la conexión, informa el problema sin anunciar una creación exitosa.
+Cada ejecución válida puede generar un documento nuevo. Por eso, ejecutar dos veces el programa puede producir dos reservas diferentes aunque sus demás campos sean iguales.
+7.3. Listar las reservas
+node --env-file=.env scripts/listar-reservas.js
+Consulta todos los documentos de la colección reservas y muestra un listado legible con sus identificadores y campos principales.
+Al finalizar informa la cantidad total recuperada.
+Si la colección está vacía, el programa debe terminar correctamente y mostrar una cantidad de cero. La consulta no crea, modifica ni elimina documentos y no utiliza los datos almacenados en memoria por la aplicación web.
+8. Evidencia de persistencia
+Para comprobar que los datos permanecen guardados entre distintas ejecuciones, se realiza el siguiente ensayo en la base individual de MongoDB Atlas.
+1.	Ejecutar el programa de listado y registrar la cantidad inicial de documentos.
+2.	Ejecutar el programa de creación y anotar el _id que devuelve.
+3.	Esperar a que el proceso termine.
+4.	Abrir una nueva ejecución de Node.js y ejecutar nuevamente el programa de listado.
+5.	Comprobar que aparece el mismo _id y que la cantidad de documentos aumentó en uno.
+6.	Ejecutar el listado una tercera vez y verificar que la cantidad permanece igual, siempre que no se hayan producido otras escrituras.
+7.	Ingresar a MongoDB Atlas, abrir Data Explorer y localizar la base reservas_salas_u7, la colección reservas y el documento identificado por ese _id.
+Registro del ensayo
+Completar esta tabla con los resultados obtenidos durante la ejecución real.
+Ejecución	Cantidad observada	_id o evidencia
+Listado inicial	Pendiente	Pendiente
+Creación de reserva	Pendiente	Pendiente
+Listado desde otro proceso	Pendiente	Pendiente
+Segundo listado posterior	Pendiente	Pendiente
+Capturas que se deben adjuntar
+•	Captura de la terminal con la cantidad inicial.
+•	Captura de la creación con el _id confirmado.
+•	Captura de una nueva ejecución que recupera ese mismo _id.
+•	Captura del segundo listado que demuestra que no se agregaron registros adicionales.
+•	Captura de MongoDB Atlas Data Explorer con la base, la colección y el documento correspondiente.
+Las capturas deben permitir relacionar el documento guardado en Atlas con el resultado obtenido desde la terminal. No deben mostrar credenciales ni información personal real.
+9. Matriz de pruebas
+La siguiente matriz debe completarse con el resultado observado. No se deben marcar como exitosos los casos que todavía no se ejecutaron.
+Caso	Resultado esperado	Resultado observado
+Conexión válida	Confirma la conexión y termina el proceso.	Pendiente
+Fallo DNS, si ocurre	Informa el código y la operación; permite documentar el diagnóstico.	Pendiente / No ocurrió
+Variable MONGODB_URI ausente	Informa un error de configuración y no anuncia éxito.	Pendiente
+Contraseña incorrecta temporal	Falla la autenticación sin crear documentos.	Pendiente
+Colección vacía, si se dispone de una base nueva	Muestra cantidad 0 y termina correctamente.	Pendiente / No disponible
+Reserva válida	Guarda el documento y devuelve su _id.	Pendiente
+Consulta desde otro proceso	Recupera el mismo _id.	Pendiente
+Segunda consulta	Mantiene la cantidad de documentos sin otras escrituras.	Pendiente
+Estudiante vacío	Rechaza la reserva y no modifica la cantidad.	Pendiente
+Email sin @	Rechaza la reserva y no modifica la cantidad.	Pendiente
+Sala no permitida	Rechaza la reserva y no modifica la cantidad.	Pendiente
+Turno no permitido	Rechaza la reserva y no modifica la cantidad.	Pendiente
+Fecha vacía	Rechaza la reserva y no modifica la cantidad.	Pendiente
+Personas igual a 0	Rechaza la reserva.	Pendiente
+Personas igual a 7	Rechaza la reserva.	Pendiente
+Personas igual a 2.5	Rechaza la reserva.	Pendiente
+Personas con texto no numérico	Rechaza la conversión o la validación, sin escritura.	Pendiente
+Para los casos inválidos, se modifica temporalmente un solo campo del objeto de prueba, se ejecuta el programa y se comprueba que la cantidad de documentos no aumente. Después se restaura la reserva válida.
+Para comprobar un error de autenticación, se modifica temporalmente la contraseña en el .env privado por un valor incorrecto, sin cambiar la contraseña del usuario en Atlas. Después se restaura la URI correcta y se repite la conexión.
+No se deben borrar documentos para conseguir una colección vacía. Si la base ya contiene registros, se debe documentar esa situación.
+10. Calidad del código
+El proyecto conserva las herramientas de calidad utilizadas en el TP 06 y amplía su alcance para incluir los programas de terminal.
+Ejecutar desde la raíz:
+npm run format
+npm run check
+Los scripts deben aplicar Prettier sobre src y scripts, verificar el formato con prettier --check y ejecutar ESLint sobre ambas carpetas.
+Los nombres exactos de los scripts dependen de la configuración de package.json.
+También se debe comprobar que eslint.config.js incluya los archivos JavaScript de ambas ubicaciones, sin eliminar las reglas existentes para ocultar errores.
+Registrar los resultados observados:
+•	npm run format: pendiente de ejecución.
+•	npm run check: pendiente de ejecución.
+11. Continuidad de la aplicación web
+La aplicación web debe conservar el comportamiento funcional del TP 06.
+Ejecutar:
 npm start
-
-Para verificar el formato y el análisis estático:
-npm run check
-
-También se debe ejecutar:
-npm run format
-antes de realizar la comprobación final.
-
-Los scripts mínimos establecidos por el TP son:
-{
-  "scripts": {
-    "start": "node src/index.js",
-    "format": "prettier --write src",
-    "format:check": "prettier --check src",
-    "lint": "eslint src",
-    "check": "npm run format:check && npm run lint"
-  }
-}
-El package-lock.json actualizado debe formar parte de la entrega. 
-________________________________________
-Configuración del entorno
-La configuración del proyecto se concentra en:
-src/configuracion.js
-Este módulo debe leer las variables de entorno PORT y NODE_ENV mediante process.env.
-La variable PORT debe convertirse a número y validarse para que sea un entero entre 1 y 65535. Si no se establece, se utiliza el puerto 3000.
-La variable NODE_ENV determina el formato de registro utilizado por Morgan:
-•	development → morgan("dev") 
-•	production → morgan("combined") 
-La configuración solamente modifica estos aspectos del entorno y no debe crear la aplicación Express ni imprimir secretos. 
-El archivo .env.example debe contener valores que no sean secretos:
-PORT=3000
-NODE_ENV=development
-El archivo .env real no debe subirse al repositorio.
-En .gitignore también deben incluirse:
-.env
-node_modules/
-________________________________________
-Mapa de módulos y dependencias
-La aplicación queda dividida de acuerdo con la responsabilidad de cada módulo:
-Módulo	Responsabilidad
-index.js	Lee configuración, crea el servicio, crea la aplicación y ejecuta listen
-configuracion.js	Lee y valida las variables de entorno
-app.js	Configura Express, middleware, vistas, rutas y 404
-rutas/reservas.js	Relaciona métodos, caminos, middleware y controladores
-controladores/reservas.js	Lee parámetros, renderiza, responde JSON, 404 y redirecciona
-servicios/reservas.js	Lista, busca, cuenta y crea reservas en memoria
-middleware/solicitudes.js	Identificador de solicitud y medición de tiempo
-middleware/reservas.js	Sección de reservas y validación
-Una característica importante es que el servicio no utiliza req ni res, porque su función es trabajar con los datos y no tomar decisiones HTTP.
-El controlador, en cambio, sí trabaja con req y res, porque transforma las operaciones del servicio en respuestas HTTP. 
-El servicio debe existir como una única instancia compartida por el listado, detalle, /estado y creación de reservas. 
-________________________________________
-
- Pipeline y contrato de rutas
-El pipeline debe conservar un orden reconocible:
-Morgan
-   ↓
-identificarSolicitud
-   ↓
-medirDuracion
-   ↓
-layouts
-   ↓
-static
-   ↓
-urlencoded
-   ↓
-json
-   ↓
-rutas de aplicación
-   ↓
-router /reservas
-   ↓
-404
-El enunciado permite mantener una variante en el orden de static y Morgan si ese orden ya estaba documentado en el TP 05. 
-Contrato de rutas
-Método	Ruta	Resultado
-GET	/	200, página de inicio
-GET	/estado	200, JSON con cantidad e ID
-GET	/reservas	200, listado
-GET	/reservas/nueva	200, formulario
-GET	/reservas/:id	200 o 404 HTML
-POST	/reservas válido	302
-POST	/reservas inválido	400
-GET	/css/estilos.css	200
-Cualquier otra URL	—	404 HTML
-Es importante que /reservas/nueva se registre antes de /reservas/:id, para evitar que Express interprete nueva como si fuera un identificador. 
-La validación debe conservar las reglas del TP 05:
-•	estudiante obligatorio; 
-•	email con @; 
-•	sala permitida; 
-•	fecha; 
-•	turno permitido; 
-•	cantidad de personas entera entre 1 y 6. 
-Un POST inválido debe responder 400, conservar los valores y no continuar hacia el controlador. Un POST válido debe preparar req.reservaValidada y continuar. 
-________________________________________
-Matriz antes/después
-La matriz permite comprobar que la refactorización no modificó el comportamiento externo de la aplicación.
-Caso	Antes – TP 05	Después – TP 06
-GET /	200	200
-GET /estado	200 JSON	200 JSON
-GET /reservas	200 listado	200 listado
-GET /reservas/nueva	200 formulario	200 formulario
-GET /reservas/:id existente	200	200
-GET /reservas/:id inexistente	404	404
-POST válido	302	302
-POST inválido	400	400
-CSS	200	200
-URL inexistente	404	404
-Reinicio	Datos iniciales	Datos iniciales
-Además, después de realizar un POST válido, la nueva reserva debe aparecer tanto en el listado como en /estado.
-La matriz debe registrar el estado HTTP, contenido o vista, cantidad de reservas y una evidencia breve. 
-________________________________________
-Formato y análisis estático
-Para mejorar la calidad del código se deben instalar como dependencias de desarrollo:
-npm install --save-dev prettier eslint @eslint/js
-Prettier se utiliza para mantener un formato uniforme del código:
-npm run format
-Para comprobar solamente el formato:
-npm run format:check
-ESLint permite realizar el análisis estático:
-npm run lint
-Finalmente, se puede ejecutar:
-npm run check
-Este último comando ejecuta:
-format:check
-      ↓
-    lint
-El análisis estático permite detectar problemas en el código, pero no reemplaza las pruebas manuales de las rutas HTTP. 
-________________________________________
-Persistencia temporal y límites
-Las reservas se mantienen solamente en memoria mediante el servicio de reservas. No se debe incorporar una base de datos ni persistencia adicional.
-El servicio es responsable de:
-•	listar reservas; 
-•	buscar una reserva; 
-•	contar reservas; 
-•	crear reservas. 
-No debe utilizar:
-req
-res
-EJS
-códigos HTTP
-Estas responsabilidades corresponden a otras capas.
-La aplicación utiliza los datos iniciales proporcionados por el proyecto. Cuando se crea una nueva reserva mediante POST, esta queda disponible durante la ejecución actual y puede consultarse mediante el listado y /estado.
-Sin embargo, al reiniciar el servidor, las reservas nuevas desaparecen y se recupera nuevamente la semilla inicial.
-Por lo tanto, la persistencia es temporal y en memoria. El TP explícitamente deja fuera de alcance MongoDB, Mongoose, escritura de archivos, nuevas APIs, autenticación, autorización, manejo centralizado de errores y pruebas automatizadas. 
-
-Conclusión
-El objetivo principal del TP 06 es refactorizar sin cambiar el comportamiento externo. La aplicación pasa de tener responsabilidades concentradas en pocos archivos a una estructura modular donde:
-index.js
-   ↓
-configuración + servicio
-   ↓
-app.js
-   ↓
-rutas
-   ↓
-middleware
-   ↓
-controladores
-   ↓
-servicio
-   ↓
-datos en memoria
-
-
-# Explicar con palabras propias por qué el servicio no usa res , qué hace el controlador, por qué el router declara caminos relativos, dónde vive el único arreglo de reservas y qué ocurrirá con él al reiniciar. Indicar los comandos ejecutados y sus resultados. No incluir contenido de .env local.
-
-
-El servicio se ocupa de la lógica del sitema y de trabajar con los datos, no se ocupa de la respuesta HTTP.
-
-Puede trabajar en la búsqueda de reservas, validar información o agregar reservas.
-
-Es por eso que no usa RES
-
-
-El controlador se encarga de conectar las respuestas con solicitudes HTTP y qué respuestas enviar.
+Comprobar los siguientes puntos:
+•	La página de inicio continúa disponible.
+•	La ruta /estado responde correctamente.
+•	El listado de reservas funciona.
+•	El formulario válido conserva su redirección y crea una reserva en memoria.
+•	El formulario inválido devuelve el estado HTTP 400 y no crea una reserva.
+•	Los recursos CSS continúan funcionando.
+•	Las rutas inexistentes muestran la respuesta 404 prevista.
+En esta etapa, las reservas del laboratorio de MongoDB no tienen por qué aparecer en las vistas web. Las reservas creadas mediante los formularios siguen siendo independientes de los documentos guardados desde los programas de terminal.
+Registrar el resultado de esta comprobación antes de entregar.
+12. Diferencias entre memoria y persistencia
+En el TP 06, las reservas se guardan en una estructura de datos en memoria. Esta información no constituye una persistencia permanente y puede perderse al reiniciar el proceso de Node.js.
+En el TP 07, las reservas del laboratorio se almacenan en MongoDB Atlas. Los documentos permanecen disponibles después de finalizar el programa y pueden recuperarse desde otra ejecución.
+Esta separación permite aprender a conectar una aplicación Node.js con una base de datos sin alterar todavía el funcionamiento de los controladores y servicios existentes.
+En la unidad 8 se podrá abordar la integración de MongoDB con el servicio HTTP para que las operaciones de la aplicación web trabajen con datos persistentes.
+13. Seguridad y buenas prácticas
+•	No subir el archivo .env a GitHub.
+•	No publicar contraseñas, URI privadas ni otros secretos.
+•	Mantener .env.example con marcadores de ejemplo.
+•	No subir node_modules ni la carpeta .git.
+•	Utilizar datos ficticios en las pruebas.
+•	Evitar capturas que expongan credenciales o información personal.
+•	Mantener package-lock.json en el repositorio para facilitar la instalación reproducible.
+•	Si se expusieron credenciales accidentalmente, reemplazarlas antes de considerar segura la entrega.
+14. Conclusión
+Este trabajo práctico incorpora una primera experiencia de persistencia con MongoDB y Mongoose al proyecto de reservas de salas de estudio.
+Se organiza la configuración de la conexión, se define un modelo con validaciones, se crean programas independientes para guardar y consultar documentos y se establece un procedimiento reproducible para verificar la persistencia entre procesos.
+La aplicación web del TP 06 conserva su funcionamiento original, lo que permite diferenciar el almacenamiento en memoria de la persistencia en una base de datos externa.
+15. Lista de verificación antes de entregar
+•	 
+El repositorio corresponde a tp-07-salas-mongodb.
+•	 
+Se incluye el código del TP 06 y el laboratorio del TP 07.
+•	 
+Se incluye package.json y package-lock.json.
+•	 
+Se incluye .env.example y .env está excluido de Git.
+•	 
+El README explica cómo preparar MongoDB Atlas Free (M0).
+•	 
+La conexión se comprueba sin crear documentos.
+•	 
+La creación devuelve el _id de una escritura confirmada.
+•	 
+El listado recupera documentos de ejecuciones anteriores.
+•	 
+Se realizaron y registraron las pruebas negativas.
+•	 
+Se adjuntó evidencia de persistencia desde terminal y Atlas.
+•	 
+Prettier y ESLint se ejecutaron sobre las carpetas correspondientes.
+•	 
+La aplicación web conserva el comportamiento del TP 06.
+•	 
+Se completaron las versiones utilizadas y los resultados observados.
+•	 
+No se publicaron credenciales ni datos personales.
 

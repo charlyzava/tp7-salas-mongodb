@@ -12,7 +12,7 @@ async function main() {
       sala: "Sala Sur",
       fecha: "2026-09-21",
       turno: "Noche",
-      personas: 5
+      personas: 5,
     });
     console.log("Reserva guardada. _id:", reserva._id.toString());
   } finally {

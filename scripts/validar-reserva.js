@@ -6,7 +6,7 @@ async function main() {
     sala: "Sala 1",
     fecha: new Date(),
     turno: "Mañana",
-    personas: 5
+    personas: 5,
   });
   await reserva.validate();
   console.log("Datos válidos; todavía no guardamos en MongoDB.");

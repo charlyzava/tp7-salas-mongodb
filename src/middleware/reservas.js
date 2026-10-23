@@ -1,15 +1,6 @@
+const salasPermitidas = ["Sala Norte", "Sala Sur", "Sala Multimedia"];
 
-const salasPermitidas = [
-  "Sala Norte",
-  "Sala Sur",
-  "Sala Multimedia"
-];
-
-const turnosPermitidos = [
-  "Mañana",
-  "Tarde",
-  "Noche"
-];
+const turnosPermitidos = ["Mañana", "Tarde", "Noche"];
 
 function prepararAreaReservas(req, res, next) {
   res.locals.seccion = "Reservas de Salas";
@@ -49,13 +40,9 @@ function validarReserva(req, res, next) {
 
   if (!personasTexto) {
     errores.push("La cantidad de personas es obligatoria.");
-  } else if (
-    !Number.isInteger(personas) ||
-    personas < 1 ||
-    personas > 6
-  ) {
+  } else if (!Number.isInteger(personas) || personas < 1 || personas > 6) {
     errores.push(
-      "La cantidad de personas debe ser un número entero entre 1 y 6."
+      "La cantidad de personas debe ser un número entero entre 1 y 6.",
     );
   }
 
@@ -77,7 +64,7 @@ function validarReserva(req, res, next) {
       errores,
       valores,
       salasPermitidas,
-      turnosPermitidos
+      turnosPermitidos,
     });
   }
 
@@ -87,7 +74,7 @@ function validarReserva(req, res, next) {
     sala,
     fecha,
     turno,
-    personas
+    personas,
   };
 
   next();
@@ -95,5 +82,5 @@ function validarReserva(req, res, next) {
 
 module.exports = {
   prepararAreaReservas,
-  validarReserva
+  validarReserva,
 };
