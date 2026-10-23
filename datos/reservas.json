@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "estudiante": "Manuel Codigoni",
+        "email": "mcodigonigenio@gmail.com",
+        "sala": "Sala Norte",
+        "fecha": "2026-10-17",
+        "turno": "Tarde",
+        "personas": 2
+    },
+    {
+        "id": 2,
+        "estudiante": "Anibal Troilo",
+        "email": "abbgh43424@yahoo.com.ar",
+        "sala": "Sala Multimedia",
+        "fecha": "2026-11-17",
+        "turno": "Noche",
+        "personas": 1
+    }
+]
