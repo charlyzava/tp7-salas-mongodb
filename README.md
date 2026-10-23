@@ -1,3 +1,25 @@
+Cómo configurar las credenciales de Atlas sin publicarlas.
+
+
+
+Qué archivo contiene la configuración y cuál establece la conexión.
+
+
+
+Cómo está definido el modelo de reservas.
+
+
+
+Cómo ejecutar el programa para crear una reserva.
+
+
+
+Cómo ejecutar el programa para consultar las reservas.
+
+
+
+Por qué esas operaciones son independientes de las rutas web de Express.
+
 
 README
 
