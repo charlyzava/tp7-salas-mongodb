@@ -1,3 +1,9 @@
+El README debe explicar cómo preparar un clúster Free, un usuario de base con lectura y escritura, la IP permitida y la URI de conexión para Node.js. La instalación local del anexo es material complementario; la evidencia de este TP se obtiene con Atlas.
+
+Conservar el comportamiento de `src/index.js`, `src/app.js`, rutas, controladores, servicio en memoria, middleware, vistas, JSON y recursos previos. Trasladar la función de configuración HTTP a `src/config/entorno.js`, agregar allí el lector de URI y actualizar sus importaciones (incluida la de `src/index.js`) antes de eliminar `src/configuracion.js`. No exigir la URI para arrancar el sitio en memoria. Incorporar archivos con responsabilidades equivalentes a:
+
+
+
 Cómo configurar las credenciales de Atlas sin publicarlas.
 
 
@@ -115,6 +121,8 @@ Para utilizar MongoDB Atlas se deben realizar los siguientes pasos:
 6.	Ingresar a la opción de conexión del clúster y obtener la cadena de conexión para una aplicación Node.js.
 7.	Reemplazar los marcadores de la cadena por el usuario, la contraseña y el host correspondientes.
 No se deben publicar la contraseña ni la URI privada del clúster.
+
+![Datos en Atlas](./public/img/pic1.png)
 
 4.4. Configurar las variables de entorno
 renombrar .env.example a un archivo llamado .env. y agregar las credenciales de Atlas al archivo.
