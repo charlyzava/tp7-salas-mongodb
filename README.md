@@ -306,3 +306,26 @@ Se completaron las versiones utilizadas y los resultados observados.
 •	 
 No se publicaron credenciales ni datos personales.
 
+#El README debe explicar cómo preparar un clúster Free, un usuario de base con lectura y escritura, la IP permitida y la URI de conexión para Node.js
+
+Crear cuenta en 
+https://www.mongodb.com/es
+
+Nombrar un cluster, por defecto Cluster0
+
+
+Por defecto se agrega la dirección ip actual, se genera un nombre de usuario y password, con posibilidad de descargar un archivo .env
+
+
+Si no descargamos el archivo env lo podemos crear y escribir en el archivo:
+PORT=3000
+NODE_ENV=development
+MONGODB_URI=<aqui pegar linea de mongodb>
+
+donde pegaremos la línea con las credenciales y el host.
+
+Es muy importante agregar el archivo en .gitignore para no comprometer la seguridad del cluster.
+
+
+Seleccionamos un método de conexión
+
