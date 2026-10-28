@@ -1,32 +1,3 @@
-El README debe explicar cómo preparar un clúster Free, un usuario de base con lectura y escritura, la IP permitida y la URI de conexión para Node.js. La instalación local del anexo es material complementario; la evidencia de este TP se obtiene con Atlas.
-
-Conservar el comportamiento de `src/index.js`, `src/app.js`, rutas, controladores, servicio en memoria, middleware, vistas, JSON y recursos previos. Trasladar la función de configuración HTTP a `src/config/entorno.js`, agregar allí el lector de URI y actualizar sus importaciones (incluida la de `src/index.js`) antes de eliminar `src/configuracion.js`. No exigir la URI para arrancar el sitio en memoria. Incorporar archivos con responsabilidades equivalentes a:
-
-
-
-Cómo configurar las credenciales de Atlas sin publicarlas.
-
-
-
-Qué archivo contiene la configuración y cuál establece la conexión.
-
-
-
-Cómo está definido el modelo de reservas.
-
-
-
-Cómo ejecutar el programa para crear una reserva.
-
-
-
-Cómo ejecutar el programa para consultar las reservas.
-
-
-
-Por qué esas operaciones son independientes de las rutas web de Express.
-
-////////////////////////////////////////
 TP 07 – Persistencia inicial de reservas de salas
 
 1. Descripción del proyecto
@@ -305,27 +276,4 @@ La aplicación web conserva el comportamiento del TP 06.
 Se completaron las versiones utilizadas y los resultados observados.
 •	 
 No se publicaron credenciales ni datos personales.
-
-#El README debe explicar cómo preparar un clúster Free, un usuario de base con lectura y escritura, la IP permitida y la URI de conexión para Node.js
-
-Crear cuenta en 
-https://www.mongodb.com/es
-
-Nombrar un cluster, por defecto Cluster0
-
-
-Por defecto se agrega la dirección ip actual, se genera un nombre de usuario y password, con posibilidad de descargar un archivo .env
-
-
-Si no descargamos el archivo env lo podemos crear y escribir en el archivo:
-PORT=3000
-NODE_ENV=development
-MONGODB_URI=<aqui pegar linea de mongodb>
-
-donde pegaremos la línea con las credenciales y el host.
-
-Es muy importante agregar el archivo en .gitignore para no comprometer la seguridad del cluster.
-
-
-Seleccionamos un método de conexión
 
